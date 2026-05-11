@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Analyse Médicale — SkinAI Prestige</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+</head>
+<body>
+<div class="page-wrapper">
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="/dashboard" class="navbar-brand">
+      <div class="brand-icon">🔬</div>
+      SkinAI Prestige
+    </a>
+    <ul class="navbar-nav">
+      <li><a href="/dashboard" id="nav-dashboard">📊 Aperçu</a></li>
+      <li><a href="/predict"   id="nav-predict"   class="active">🧬 Analyse IA</a></li>
+      <li><a href="/patients"  id="nav-patients">👥 Patients</a></li>
+      <li><a href="/logout"    id="nav-logout"   class="btn-logout">⏻ Session</a></li>
+    </ul>
+  </nav>
+
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-container">
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- Main Content -->
+  <main class="main-content animate-up">
+    <div class="page-header" style="text-align: center; margin-bottom: 4rem;">
+      <h1 style="font-size: 3rem; margin-bottom: 1rem;">Nouveau Diagnostic</h1>
+      <p style="font-size: 1.2rem; color: var(--text-muted); max-width: 700px; margin: 0 auto;">
+        Veuillez renseigner les paramètres cliniques et uploader le cliché dermoscopique haute résolution.
+      </p>
+    </div>
+
+    <div class="grid-2">
+      <!-- Form Card -->
+      <div class="card">
+        <div class="card-header">
+          <h2><span>📋</span> Dossier Patient</h2>
+        </div>
+        <div class="card-body">
+          <form id="predict-form" method="POST" action="/predict" enctype="multipart/form-data">
+
+            <div class="form-group">
+              <label class="form-label" for="name">Identité Civile</label>
+              <input class="form-control" type="text" id="name" name="name"
+                     placeholder="Prénom et Nom" required/>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="age">Âge Physiologique</label>
+              <input class="form-control" type="number" id="age" name="age"
+                     placeholder="Ex: 42" min="1" max="120" required/>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Capture Dermoscopique</label>
+              <div class="upload-container" id="drop-zone">
+                <span class="upload-icon">📸</span>
+                <div class="upload-text">
+                  <h3 id="file-name-display">Déposez l'image ici</h3>
+                  <p>Format supporté : RAW, JPEG, PNG (max 10MB)</p>
+                </div>
+                <input type="file" id="image-input" name="image"
+                       accept="image/jpeg,image/png,image/jpg" required style="display:none;"/>
+              </div>
+            </div>
+
+            <!-- Image Preview -->
+            <div id="preview-container" style="display:none; margin-bottom:2rem; text-align:center;">
+              <div style="position: relative; display: inline-block;">
+                <img id="preview-img" src="" alt="Aperçu"
+                     style="max-height:220px; border-radius:var(--radius-md); border:2px solid var(--accent); box-shadow: 0 0 20px var(--accent-glow);"/>
+              </div>
+            </div>
+
+            <button id="btn-analyze" type="submit" class="btn btn-primary" style="width: 100%;">
+              Lancer l'Intelligence Artificielle
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Protocol Card -->
+      <div class="card">
+        <div class="card-header">
+          <h2><span>🛡️</span> Protocole d'Examen</h2>
+        </div>
+        <div class="card-body">
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 2rem;">
+            <li style="display: flex; gap: 1rem;">
+              <div style="font-weight: 800; color: var(--accent); font-size: 1.5rem;">01</div>
+              <div>
+                <h4 style="margin-bottom: 0.25rem;">Collecte des Données</h4>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Saisie rigoureuse des informations d'identification pour le registre.</p>
+              </div>
+            </li>
+            <li style="display: flex; gap: 1rem;">
+              <div style="font-weight: 800; color: var(--accent); font-size: 1.5rem;">02</div>
+              <div>
+                <h4 style="margin-bottom: 0.25rem;">Prétraitement d'Image</h4>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">L'image est normalisée et filtrée pour éliminer les artéfacts visuels.</p>
+              </div>
+            </li>
+            <li style="display: flex; gap: 1rem;">
+              <div style="font-weight: 800; color: var(--accent); font-size: 1.5rem;">03</div>
+              <div>
+                <h4 style="margin-bottom: 0.25rem;">Analyse Neuronale</h4>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Le réseau VGG16 traite l'image pour détecter les motifs de malignité.</p>
+              </div>
+            </li>
+          </ul>
+
+          <div style="margin-top: 3rem; padding: 1.5rem; background: rgba(245, 158, 11, 0.05); border-left: 4px solid var(--warning); border-radius: 4px;">
+            <p style="color: var(--warning); font-weight: 700; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 0.5rem;">Certification Médicale</p>
+            <p style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.5;">
+              Ce système est un dispositif de support clinique. La décision finale incombe au praticien expert.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>SkinAI Prestige &copy; 2024 — Excellence Médicale & Innovation</p>
+  </footer>
+</div>
+
+<script>
+  const dropZone = document.getElementById('drop-zone');
+  const input = document.getElementById('image-input');
+  const preview = document.getElementById('preview-img');
+  const previewContainer = document.getElementById('preview-container');
+  const fileNameDisplay = document.getElementById('file-name-display');
+
+  dropZone.addEventListener('click', () => input.click());
+
+  input.addEventListener('change', function () {
+    if (this.files && this.files[0]) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        preview.src = e.target.result;
+        previewContainer.style.display = 'block';
+        fileNameDisplay.textContent = this.files[0].name;
+        fileNameDisplay.style.color = 'var(--accent)';
+      };
+      reader.readAsDataURL(this.files[0]);
+    }
+  });
+
+  // Drag and Drop
+  dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.style.borderColor = 'var(--accent)';
+    dropZone.style.background = 'var(--accent-soft)';
+  });
+
+  dropZone.addEventListener('dragleave', () => {
+    dropZone.style.borderColor = 'var(--glass-border)';
+    dropZone.style.background = 'rgba(255, 255, 255, 0.01)';
+  });
+
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    input.files = e.dataTransfer.files;
+    const event = new Event('change');
+    input.dispatchEvent(event);
+  });
+
+  document.getElementById('predict-form').addEventListener('submit', function () {
+    const btn = document.getElementById('btn-analyze');
+    btn.innerHTML = '<span>⚡</span> Séquençage IA en cours...';
+    btn.disabled = true;
+    btn.style.opacity = '0.7';
+  });
+</script>
+</body>
+</html>

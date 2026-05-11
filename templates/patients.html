@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Registre Patients — SkinAI Prestige</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+</head>
+<body>
+<div class="page-wrapper">
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="/dashboard" class="navbar-brand">
+      <div class="brand-icon">🔬</div>
+      SkinAI Prestige
+    </a>
+    <ul class="navbar-nav">
+      <li><a href="/dashboard" id="nav-dashboard">📊 Aperçu</a></li>
+      <li><a href="/predict"   id="nav-predict">🧬 Analyse IA</a></li>
+      <li><a href="/patients"  id="nav-patients" class="active">👥 Patients</a></li>
+      <li><a href="/logout"    id="nav-logout"   class="btn-logout">⏻ Session</a></li>
+    </ul>
+  </nav>
+
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-container">
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- Main Content -->
+  <main class="main-content animate-up">
+    <div class="page-header" style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 3rem;">
+      <div>
+        <h1 style="font-size: 2.5rem;">Registre Clinique</h1>
+        <p style="color: var(--text-muted); font-size: 1.1rem;">{{ patients|length }} dossier(s) archivé(s) dans la base sécurisée.</p>
+      </div>
+      <a id="btn-new-predict" href="/predict" class="btn btn-primary">Nouveau Scan</a>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2><span>📋</span> Historique des Diagnostics</h2>
+      </div>
+
+      {% if patients %}
+      <div class="table-container">
+        <table id="patients-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Praticien/Patient</th>
+              <th>Âge</th>
+              <th>État</th>
+              <th>Confiance IA</th>
+              <th>Horodatage</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in patients %}
+            <tr>
+              <td style="color:var(--text-dim); font-weight:700; font-family: 'Outfit';">#{{ p.id }}</td>
+              <td>
+                <div style="font-weight:700; color: var(--text-main);">{{ p.name }}</div>
+              </td>
+              <td style="font-weight: 500;">{{ p.age }} ans</td>
+              <td>
+                {% if p.result == 'Malignant' %}
+                  <span class="result-badge malignant" style="padding: 0.2rem 0.6rem; font-size: 0.7rem; margin-bottom: 0;">Maligne</span>
+                {% else %}
+                  <span class="result-badge benign" style="padding: 0.2rem 0.6rem; font-size: 0.7rem; margin-bottom: 0;">Bénigne</span>
+                {% endif %}
+              </td>
+              <td>
+                <div style="min-width:120px;">
+                  <div style="font-size:0.75rem; font-weight: 800; margin-bottom:0.4rem; color: var(--text-dim);">
+                    {% if p.result == 'Malignant' %}
+                      {{ (p.probability * 100)|round(1) }}%
+                    {% else %}
+                      {{ (100 - (p.probability * 100))|round(1) }}%
+                    {% endif %}
+                  </div>
+                  <div class="probability-bar" style="height: 6px; margin: 0;">
+                    {% if p.result == 'Malignant' %}
+                      <div class="probability-fill" style="width:{{ (p.probability * 100)|round(1) }}%; background: var(--danger);"></div>
+                    {% else %}
+                      <div class="probability-fill" style="width:{{ (100 - (p.probability * 100))|round(1) }}%; background: var(--success);"></div>
+                    {% endif %}
+                  </div>
+                </div>
+              </td>
+              <td style="color:var(--text-dim); font-size:0.8rem; font-weight: 500;">
+                {{ p.created_at.strftime('%d %b %Y | %H:%M') if p.created_at else '—' }}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="card-body" style="text-align: center; padding: 5rem 2rem;">
+        <div style="font-size: 4rem; margin-bottom: 1.5rem; opacity: 0.3;">🧬</div>
+        <h3 style="margin-bottom: 1rem;">Base de données vierge</h3>
+        <p style="color:var(--text-muted); margin-bottom:2.5rem; max-width: 400px; margin-left: auto; margin-right: auto;">
+          Aucun diagnostic n'a encore été enregistré dans le système SkinAI Prestige.
+        </p>
+        <a id="btn-empty-predict" href="/predict" class="btn btn-primary">Lancer le premier scan</a>
+      </div>
+      {% endif %}
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>SkinAI Prestige &copy; 2024 — Excellence Médicale & Innovation</p>
+  </footer>
+</div>
+</body>
+</html>

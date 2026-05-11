@@ -1,0 +1,5 @@
+Flask==3.0.3
+mysql-connector-python==9.0.0
+Pillow>=11.0.0
+numpy>=2.0.0
+tensorflow>=2.18.0

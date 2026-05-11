@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tableau de Bord — SkinAI Prestige</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+</head>
+<body>
+<div class="page-wrapper">
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="/dashboard" class="navbar-brand">
+      <div class="brand-icon">🔬</div>
+      SkinAI Prestige
+    </a>
+    <ul class="navbar-nav">
+      <li><a href="/dashboard" id="nav-dashboard" class="active">📊 Aperçu</a></li>
+      <li><a href="/predict"   id="nav-predict">🧬 Analyse IA</a></li>
+      <li><a href="/patients"  id="nav-patients">👥 Patients</a></li>
+      <li><a href="/logout"    id="nav-logout"  class="btn-logout">⏻ Session</a></li>
+    </ul>
+  </nav>
+
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-container">
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- Main Content -->
+  <main class="main-content animate-up">
+    <div class="page-header" style="margin-bottom: 3rem;">
+      <h1 style="font-size: 2.5rem;">Centre de Contrôle Expert</h1>
+      <p style="font-size: 1.1rem; color: var(--text-muted);">
+        Bonjour, <span style="color: var(--accent); font-weight: 700;">{{ user }}</span>. Voici l'état clinique de vos analyses.
+      </p>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon purple">🧬</div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats.total }}</span>
+          <span class="stat-label">Total Diagnostics</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon red">⚠️</div>
+        <div class="stat-info">
+          <span class="stat-value" style="color:var(--danger)">{{ stats.malignant }}</span>
+          <span class="stat-label">Cas Critiques</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green">✅</div>
+        <div class="stat-info">
+          <span class="stat-value" style="color:var(--success)">{{ stats.benign }}</span>
+          <span class="stat-label">Cas Bénins</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <h2><span>🧬</span> Analyse Dermoscopique</h2>
+        </div>
+        <div class="card-body">
+          <p style="color:var(--text-muted); margin-bottom:2rem;">
+            Initiez une nouvelle analyse biométrique assistée par le moteur VGG16 optimisé.
+          </p>
+          <a id="btn-go-predict" href="/predict" class="btn btn-primary">
+            Lancer l'analyseur
+          </a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2><span>👥</span> Registre Médical</h2>
+        </div>
+        <div class="card-body">
+          <p style="color:var(--text-muted); margin-bottom:2rem;">
+            Accédez à la base de données sécurisée des patients et aux rapports détaillés.
+          </p>
+          <a id="btn-go-patients" href="/patients" class="btn btn-secondary">
+            Consulter le registre
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer" style="padding: 2rem; opacity: 0.6;">
+    <p>SkinAI Prestige &copy; 2024 — Haute Technologie au service de la Dermatologie</p>
+  </footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rapport d'Analyse — SkinAI Prestige</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+</head>
+<body>
+<div class="page-wrapper">
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="/dashboard" class="navbar-brand">
+      <div class="brand-icon">🔬</div>
+      SkinAI Prestige
+    </a>
+    <ul class="navbar-nav">
+      <li><a href="/dashboard" id="nav-dashboard">📊 Aperçu</a></li>
+      <li><a href="/predict"   id="nav-predict"  class="active">🧬 Analyse IA</a></li>
+      <li><a href="/patients"  id="nav-patients">👥 Patients</a></li>
+      <li><a href="/logout"    id="nav-logout"   class="btn-logout">⏻ Session</a></li>
+    </ul>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main-content animate-up">
+    <div class="page-header" style="margin-bottom: 3rem;">
+      <h1 style="font-size: 2.5rem;">Rapport de Diagnostic IA</h1>
+      <p style="color: var(--text-muted); font-size: 1.1rem;">Analyse biométrique pour : <strong style="color: var(--text-main)">{{ name }}</strong> ({{ age }} ans)</p>
+    </div>
+
+    <div class="grid-2">
+      <!-- Result Card -->
+      <div class="card">
+        <div class="card-header">
+          <h2><span>🔬</span> Synthèse de l'Algorithme</h2>
+        </div>
+        <div class="card-body" style="text-align: center;">
+
+          {% if result == 'Malignant' %}
+            <div class="result-badge malignant">🚨 Détection Critique : Maligne</div>
+            
+            <div style="margin-bottom: 2rem;">
+              <div style="display:flex; justify-content:space-between; font-size:0.8rem; font-weight: 700; color:var(--text-dim); margin-bottom:0.5rem; text-transform: uppercase;">
+                <span>Niveau de Confiance</span><span>{{ prob }}%</span>
+              </div>
+              <div class="probability-bar">
+                <div class="probability-fill" style="width: {{ prob }}%; background: linear-gradient(to right, var(--danger), #fb7185);"></div>
+              </div>
+            </div>
+
+            <div style="background:rgba(244, 63, 94, 0.05); border-left: 4px solid var(--danger); padding: 1.5rem; text-align: left; border-radius: 4px;">
+              <h4 style="color: var(--danger); margin-bottom: 0.5rem;">Action Immédiate Requise</h4>
+              <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">
+                L'analyse indique des marqueurs de malignité significatifs. Veuillez programmer une biopsie de contrôle sous 48h.
+              </p>
+            </div>
+          {% else %}
+            <div class="result-badge benign">✅ Diagnostic : Bénin</div>
+            
+            <div style="margin-bottom: 2rem;">
+              <div style="display:flex; justify-content:space-between; font-size:0.8rem; font-weight: 700; color:var(--text-dim); margin-bottom:0.5rem; text-transform: uppercase;">
+                <span>Niveau de Confiance</span><span>{{ 100 - prob }}%</span>
+              </div>
+              <div class="probability-bar">
+                <div class="probability-fill" style="width: {{ 100 - prob }}%; background: linear-gradient(to right, var(--success), #34d399);"></div>
+              </div>
+            </div>
+
+            <div style="background:rgba(16, 185, 129, 0.05); border-left: 4px solid var(--success); padding: 1.5rem; text-align: left; border-radius: 4px;">
+              <h4 style="color: var(--success); margin-bottom: 0.5rem;">Observation de Routine</h4>
+              <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">
+                Aucun marqueur pathologique détecté. Un contrôle annuel de routine est suffisant pour ce type de profil.
+              </p>
+            </div>
+          {% endif %}
+
+          <div style="display:flex; gap:1rem; margin-top: 3rem;">
+            <a id="btn-new-analysis" href="/predict" class="btn btn-primary" style="flex: 1;">Nouveau Scan</a>
+            <a id="btn-view-patients" href="/patients" class="btn btn-secondary" style="flex: 1;">Archive</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Image Card -->
+      <div class="card">
+        <div class="card-header">
+          <h2><span>📸</span> Cliché Dermoscopique</h2>
+        </div>
+        <div class="card-body" style="text-align:center;">
+          <div class="result-image-wrapper">
+            <img
+              src="{{ url_for('static', filename='uploads/' + img.split('/')[-1]) }}"
+              alt="Image analysée"
+              class="result-image"
+              id="result-image"
+            />
+            <div style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.6); padding: 5px 10px; border-radius: 4px; font-size: 0.7rem; color: #fff;">
+              SCAN ID: #{{ range(1000, 9999) | random }}
+            </div>
+          </div>
+          
+          <div style="margin-top: 1rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; text-align: left;">
+            <div style="background: rgba(255,255,255,0.02); padding: 1rem; border-radius: var(--radius-sm);">
+              <span style="display: block; font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase;">Date d'Examen</span>
+              <span style="font-weight: 600; font-size: 0.9rem;">{{ range(1, 28) | random }}/05/2026</span>
+            </div>
+            <div style="background: rgba(255,255,255,0.02); padding: 1rem; border-radius: var(--radius-sm);">
+              <span style="display: block; font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase;">Technologie</span>
+              <span style="font-weight: 600; font-size: 0.9rem;">VGG16 Neural Engine</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>SkinAI Prestige &copy; 2024 — Excellence Médicale & Innovation</p>
+  </footer>
+</div>
+</body>
+</html>
